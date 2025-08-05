@@ -14,23 +14,40 @@ import org.springframework.stereotype.Service;
 import java.util.ArrayList;
 import java.util.List;
 
+/**
+ * Service class responsible for managing Question-related business logic.
+ */
 @Service
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
 
     @Autowired
-    Environment environment; // spring environment
+    Environment environment; // Spring environment to access properties, e.g. server port
 
+    /**
+     * Constructor for QuestionService with repository injection.
+     * @param questionRepository repository for Question entities
+     */
     @Autowired
     public QuestionService(QuestionRepository questionRepository) {
         this.questionRepository = questionRepository;
     }
 
+    /**
+     * Retrieves all questions from the database.
+     * @return list of all questions
+     */
     public List<Question> getAllQuestion() {
         return questionRepository.findAll();
     }
 
+    /**
+     * Retrieves questions filtered by category.
+     * Throws CategoryNotFoundException if no questions found for given category.
+     * @param category the category name to filter questions
+     * @return list of questions matching the category
+     */
     public List<Question> getQuestionsByCategory(String category) {
         List<Question> questions = questionRepository.findByCategory(category);
         if (questions == null || questions.isEmpty()) {
@@ -39,15 +56,32 @@ public class QuestionService {
         return questions;
     }
 
+    /**
+     * Retrieves a question by its ID.
+     * Throws QuestionNotFoundException if question does not exist.
+     * @param id question ID
+     * @return Question object
+     */
     public Question getQuestionById(int id) {
         return questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException("Question with id= " + id + " not found."));
     }
 
+    /**
+     * Adds a new question to the database.
+     * @param question the Question object to add (validated)
+     * @return the saved Question object
+     */
     public Question addQuestion(@Valid Question question) {
         return questionRepository.save(question);
     }
 
+    /**
+     * Deletes a question by ID.
+     * Throws QuestionNotFoundException if question not found.
+     * @param id the question ID to delete
+     * @return the deleted Question object
+     */
     public Question deleteQuestion(int id) {
         Question questionToDelete = questionRepository.findById(id)
                 .orElseThrow(() -> new QuestionNotFoundException("Question with id= " + id + " not found."));
@@ -55,6 +89,12 @@ public class QuestionService {
         return questionToDelete;
     }
 
+    /**
+     * Generates a list of questions randomly selected by category and count.
+     * @param category the category to filter questions
+     * @param numQuestions number of questions to generate
+     * @return list of randomly selected Question objects
+     */
     public List<Question> generateQuestions(String category, int numQuestions) {
         List<Integer> questionsId = questionRepository.findRandomQuestionsByCategory(category, numQuestions);
         List<Question> questions = new ArrayList<>();
@@ -66,12 +106,24 @@ public class QuestionService {
         return questions;
     }
 
+    /**
+     * Generates a list of question IDs randomly selected by category and count.
+     * @param category the category to filter questions
+     * @param numQuestions number of question IDs to generate
+     * @return list of question IDs
+     */
     public List<Integer> generateQuestionIds(String category, int numQuestions) {
         return questionRepository.findRandomQuestionsByCategory(category, numQuestions);
     }
 
+    /**
+     * Retrieves a list of QuestionWrapper DTOs for given question IDs.
+     * Prints the server port to verify load balancing in a microservices environment.
+     * @param questionIds list of question IDs to retrieve
+     * @return list of QuestionWrapper objects (simplified question view)
+     */
     public List<QuestionWrapper> getWrapperQuestions(List<Integer> questionIds) {
-        System.out.println("Port called = " + environment.getProperty("local.server.port")); // to check load balancing feature
+        System.out.println("Port called = " + environment.getProperty("local.server.port")); // For load balancing trace
         List<QuestionWrapper> wrappedQns = new ArrayList<>();
 
         for(int id : questionIds) {
@@ -90,6 +142,11 @@ public class QuestionService {
         return wrappedQns;
     }
 
+    /**
+     * Calculates the score (number of correct answers) based on user responses.
+     * @param responses list of QuizResponse objects containing user answers
+     * @return number of correct answers
+     */
     public Integer getScore(List<QuizResponse> responses) {
         int correctAnswer = 0;
 
