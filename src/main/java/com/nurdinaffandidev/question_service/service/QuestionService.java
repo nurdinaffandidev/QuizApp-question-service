@@ -8,6 +8,7 @@ import com.nurdinaffandidev.question_service.model.QuizResponse;
 import com.nurdinaffandidev.question_service.repository.QuestionRepository;
 import jakarta.validation.Valid;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
@@ -17,6 +18,9 @@ import java.util.List;
 public class QuestionService {
 
     private final QuestionRepository questionRepository;
+
+    @Autowired
+    Environment environment; // spring environment
 
     @Autowired
     public QuestionService(QuestionRepository questionRepository) {
@@ -67,6 +71,7 @@ public class QuestionService {
     }
 
     public List<QuestionWrapper> getWrapperQuestions(List<Integer> questionIds) {
+        System.out.println("Port called = " + environment.getProperty("local.server.port")); // to check load balancing feature
         List<QuestionWrapper> wrappedQns = new ArrayList<>();
 
         for(int id : questionIds) {
