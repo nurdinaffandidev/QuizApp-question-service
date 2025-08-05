@@ -12,7 +12,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
 
 @Service
 public class QuestionService {
@@ -63,11 +62,14 @@ public class QuestionService {
         return questions;
     }
 
-    public List<QuestionWrapper> generateWrapperQuestions(String category, int numQuestions) {
-        List<Integer> questionsId = questionRepository.findRandomQuestionsByCategory(category, numQuestions);
-        List<QuestionWrapper> questions = new ArrayList<>();
+    public List<Integer> generateQuestionIds(String category, int numQuestions) {
+        return questionRepository.findRandomQuestionsByCategory(category, numQuestions);
+    }
 
-        for(int id : questionsId) {
+    public List<QuestionWrapper> getWrapperQuestions(List<Integer> questionIds) {
+        List<QuestionWrapper> wrappedQns = new ArrayList<>();
+
+        for(int id : questionIds) {
             Question question = getQuestionById(id);
             QuestionWrapper wrappedQn = new QuestionWrapper(
                     question.getId(),
@@ -77,10 +79,10 @@ public class QuestionService {
                     question.getOption4(),
                     question.getQuestionTitle()
             );
-            questions.add(wrappedQn);
+            wrappedQns.add(wrappedQn);
         }
 
-        return questions;
+        return wrappedQns;
     }
 
     public Integer getScore(List<QuizResponse> responses) {
