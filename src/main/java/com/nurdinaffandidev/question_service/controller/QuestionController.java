@@ -67,10 +67,16 @@ public class QuestionController {
         return new ResponseEntity<>(questionService.generateQuestions(category, numQuestions), HttpStatus.OK);
     }
 
-    // generate wrapper questions
-    @GetMapping("/generate-wrapper-questions")
-    public ResponseEntity<List<QuestionWrapper>> generateWrapperQuestions(@RequestParam String category, @RequestParam int numQuestions) {
-        return new ResponseEntity<>(questionService.generateWrapperQuestions(category, numQuestions), HttpStatus.OK);
+    // generate questions
+    @GetMapping("/generate-question-ids")
+    public ResponseEntity<List<Integer>> generateQuestionIds(@RequestParam String category, @RequestParam int numQuestions) {
+        return new ResponseEntity<>(questionService.generateQuestionIds(category, numQuestions), HttpStatus.OK);
+    }
+
+    // retrieve wrapper questions
+    @PostMapping("/retrieve-wrapper-questions")
+    public ResponseEntity<List<QuestionWrapper>> retrieveWrapperQuestions(@RequestBody List<Integer> questionIds) {
+        return new ResponseEntity<>(questionService.getWrapperQuestions(questionIds), HttpStatus.OK);
     }
 
     // get score
